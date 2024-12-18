@@ -1,8 +1,10 @@
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from os import path
+import sqlite3
 
 # Инициализация приложения
 app = Flask(__name__)
@@ -13,17 +15,24 @@ rgz = Blueprint('rgz', __name__, url_prefix='/rgz')
 
 # Функции для работы с базой данных
 def db_connect():
-    try:
+
+    if current_app.config['DB_TYPE'] == 'postgres':
+        
         conn = psycopg2.connect(
-            host='127.0.0.1',
-            database='zaxarov_ilya_knowledge_base',
-            user='zaxarov_ilya_knowledge_base',
-            password='123'
+            host = '127.0.0.1',
+            database = 'zaxarov_ilya_knowledge_base',
+            user = 'zaxarov_ilya_knowledge_base',
+            password = '123'
         )
-        return conn, conn.cursor(cursor_factory=RealDictCursor)
-    except Exception as e:
-        print(f"Ошибка подключения к базе данных: {e}")
-        return None, None
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+    else:
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+    return conn, cur
 
 def db_close(conn, cur):
     if cur: cur.close()
