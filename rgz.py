@@ -6,7 +6,7 @@ import os
 
 # Инициализация приложения
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Обязательно укажите ключ для сессий
+app.secret_key = 'your_secret_key_here'  
 
 # Создание Blueprint
 rgz = Blueprint('rgz', __name__, url_prefix='/rgz')
