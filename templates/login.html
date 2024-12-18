@@ -3,15 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <title>Login</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label>Username: <input type="text" name="username" required></label><br>
-        <label>Password: <input type="password" name="password" required></label><br>
-        <button type="submit">Login</button>
-    </form>
-    <a href="/">Back to Home</a>
+    <header>
+        LoveStory
+    </header>
+    <h1>Вход</h1>
+    <div>
+        <form action="{{ url_for('rgz.login') }}" method="post">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="Имя пользователя" required><br>
+            
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="Пароль" required><br>
+            
+            <button type="submit">Войти</button>
+        </form>
+        <a href="{{ url_for('rgz.main') }}">На главную</a>
+    </div>  
+    <footer>
+        &copy; Захаров Илья
+    </footer>
 </body>
 </html>

@@ -3,29 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Profiles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <title>Поиск</title>
 </head>
 <body>
-    <h1>Search Profiles</h1>
-    <form action="/search" method="get">
-        <label>Name: <input type="text" name="name" value="{{ name_query }}"></label><br>
-        <label>Age: <input type="number" name="age" value="{{ age_query }}"></label><br>
-        <button type="submit">Search</button>
+     <header>
+        LoveStory
+    </header>
+    <h1 style="margin-right: 100px;">Поиск профилей</h1>
+    <form action="/rgz/search" method="get">
+        <label>Пол:
+            <select name="looking_for">
+                <option value="Мужчина" {% if looking_for == "Мужчина" %}selected{% endif %}>Мужчина</option>
+                <option value="Женщина" {% if looking_for == "Женщина" %}selected{% endif %}>Женщина</option>
+            </select>
+        </label><br>
+        <label>Возраст от: <input type="number" name="min_age" value="{{ min_age }}" min="18"></label><br>
+        <label>Возраст до: <input type="number" name="max_age" value="{{ max_age }}" max="100"></label><br>
+        <button type="submit">Найти</button>
     </form>
-    <ul>
-        {% for user in users.items %}
+
+    <h2 style="margin-left: 600px;">Результаты поиска:</h2>
+    <ul style="margin-top: 50px; margin-left: 50px">
+        {% for user in users %}
         <li>
             <h3>{{ user.name }} ({{ user.age }})</h3>
             <p>{{ user.about }}</p>
         </li>
         {% endfor %}
     </ul>
-    {% if users.has_prev %}
-        <a href="?name={{ name_query }}&age={{ age_query }}&page={{ users.prev_num }}">Previous</a>
-    {% endif %}
-    {% if users.has_next %}
-        <a href="?name={{ name_query }}&age={{ age_query }}&page={{ users.next_num }}">Next</a>
-    {% endif %}
-    <a href="/profile">Back to Profile</a>
+
+    <a href="/rgz/profile">Назад в профиль</a>
+    <footer>
+        &copy; Захаров Илья
+    </footer>
 </body>
 </html>

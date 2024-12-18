@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <title>Профиль</title>
 </head>
 <body>
-    <h1>Welcome, {{ user.name }}</h1>
-    <form action="/profile" method="post" enctype="multipart/form-data">
-        <label>Name: <input type="text" name="name" value="{{ user.name }}" required></label><br>
-        <label>Age: <input type="number" name="age" value="{{ user.age }}" required></label><br>
-        <label>Gender:
-            <select name="gender" required>
-                <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
-                <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
-            </select>
-        </label><br>
-        <label>Looking for:
-            <select name="looking_for" required>
-                <option value="male" {% if user.looking_for == 'male' %}selected{% endif %}>Male</option>
-                <option value="female" {% if user.looking_for == 'female' %}selected{% endif %}>Female</option>
-            </select>
-        </label><br>
-        <label>About: <textarea name="about">{{ user.about }}</textarea></label><br>
-        <label>Photo: <input type="file" name="photo"></label><br>
-        <label>Hide Profile: <input type="checkbox" name="hidden" {% if user.hidden %}checked{% endif %}></label><br>
-        <button type="submit">Update Profile</button>
-    </form>
-    <form action="/delete_account" method="post">
-        <button type="submit" style="color: red;">Delete Account</button>
-    </form>
-    <a href="/logout">Logout</a>
+    <header>
+        LoveStory
+    </header>
+    <h1>Добро пожаловать, {{ user['username'] }}!</h1>
+    <div>
+        <a href="{{ url_for('rgz.main') }}">На главную</a> |
+        <a href="{{ url_for('rgz.search') }}">Искать профили</a> |
+        <a href="{{ url_for('rgz.logout') }}">Выйти</a>
+        <h2 style="font-size: 30px">Обо мне</h2>
+        <ul style="font-size: 25px">
+            <li><strong>Имя:</strong> {{ user['name'] }}</li>
+            <li><strong>Email:</strong> {{ user['email'] }}</li>
+            <li><strong>Возраст:</strong> {{ user['age'] }}</li>
+            <li><strong>Пол:</strong> {{ user['gender'] }}</li>
+            <li><strong>Вы ищете:</strong> {{ user['looking_for'] }}</li>
+            <li><strong>О себе:</strong> {{ user['about'] or 'Не указано' }}</li>
+        </ul>
+
+        <form action="{{ url_for('rgz.delete_account') }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.')">
+            <button type="submit" style="color: red; font-size: 20px;">Удалить аккаунт</button>
+        </form>
+    </div>
+    <footer>
+        &copy; Захаров Илья
+    </footer>
 </body>
 </html>

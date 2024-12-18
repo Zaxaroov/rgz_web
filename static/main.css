@@ -1,0 +1,88 @@
+h1 {
+    text-align: center;
+}
+
+body {
+    background-color:rgb(178, 163, 140);
+    color: black;
+    font-family: Arial;
+    margin: 0px;
+    overflow: auto; 
+    height: 100%;
+}
+
+header {
+    background-color: rgb(136, 122, 101);
+    color: rgb(0, 0, 0);
+    font-family: Arial;
+    margin: 0px;
+    font-weight: bold;
+    font-size: 25pt;
+}
+
+footer {
+    background-color: rgb(136, 122, 101);
+    color: rgb(0, 0, 0);
+    font-family: Arial;
+    text-align: right;
+    margin: 0px;
+    font-weight: bold;
+    font-size: 10pt;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+a {
+    color: green;
+    text-decoration: none;
+    transition: 5s 1s;
+}
+
+a:link {
+    color: blue;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: rgb(113, 0, 28);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: red;
+    text-decoration: underline;
+    transition: 0.3s;
+}
+
+a:active {
+    color: black;
+    opacity: 0.3;
+}
+
+form {
+    margin-left:585px;
+    border: 1px, black;
+}
+
+input {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+button {
+    text-align: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+}
+
+div {
+    margin-left: 100px;
+    width: 500px;
+}
+
+
