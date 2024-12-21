@@ -69,10 +69,18 @@ def register():
 
             # Хешируем пароль и добавляем пользователя
             hashed_password = generate_password_hash(data['Пароль'])
-            cur.execute("""
-                INSERT INTO usersi (username, password, email, name, age, gender, looking_for, about) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (data['Имя пользователя'], hashed_password, data['email'], data['Имя'], int(data['Возраст']), data['Пол'], data['Я ищу'], data['Обо мне'] or ''))
+            
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("""
+                    INSERT INTO usersi (username, password, email, name, age, gender, looking_for, about) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (data['Имя пользователя'], hashed_password, data['email'], data['Имя'], int(data['Возраст']), data['Пол'], data['Я ищу'], data['Обо мне'] or ''))
+            else:
+                cur.execute("""
+                    INSERT INTO usersi (username, password, email, name, age, gender, looking_for, about) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (data['Имя пользователя'], hashed_password, data['email'], data['Имя'], int(data['Возраст']), data['Пол'], data['Я ищу'], data['Обо мне'] or ''))
+
             conn.commit()
 
             flash('Регистрация прошла успешно!')
@@ -105,7 +113,10 @@ def login():
             return redirect(url_for('rgz.login'))
 
         try:
-            cur.execute("SELECT * FROM usersi WHERE username = %s", (username,))
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("SELECT * FROM usersi WHERE username = %s", (username,))
+            else:
+                cur.execute("SELECT * FROM usersi WHERE username = ?", (username,))
             user = cur.fetchone()
             if user and check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
@@ -135,7 +146,10 @@ def profile():
 
     try:
         # Получаем текущие данные пользователя
-        cur.execute("SELECT * FROM usersi WHERE id = %s", (session['user_id'],))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM usersi WHERE id = %s", (session['user_id'],))
+        else:
+            cur.execute("SELECT * FROM usersi WHERE id = ?", (session['user_id'],))
         user = cur.fetchone()
 
         if request.method == 'POST':
@@ -151,11 +165,19 @@ def profile():
                 photo.save(photo_path)
 
             # Обновляем данные в базе
-            cur.execute("""
-                UPDATE usersi 
-                SET name = %s, age = %s, gender = %s, looking_for = %s, about = %s, hidden = %s, photo = %s
-                WHERE id = %s
-            """, (updates['Имя'], int(updates['Возраст']), updates['Пол'], updates['Я ищу'], updates['Обо мне'], hidden, photo_path, session['user_id']))
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("""
+                    UPDATE usersi 
+                    SET name = %s, age = %s, gender = %s, looking_for = %s, about = %s, hidden = %s, photo = %s
+                    WHERE id = %s
+                """, (updates['Имя'], int(updates['Возраст']), updates['Пол'], updates['Я ищу'], updates['Обо мне'], hidden, photo_path, session['user_id']))
+            else:
+                cur.execute("""
+                    UPDATE usersi 
+                    SET name = ?, age = ?, gender = ?, looking_for = ?, about = ?, hidden = ?, photo = ?
+                    WHERE id = ?
+                """, (updates['Имя'], int(updates['Возраст']), updates['Пол'], updates['Я ищу'], updates['Обо мне'], hidden, photo_path, session['user_id']))
+
             conn.commit()
             flash('Профиль обновлен!')
             return redirect(url_for('rgz.profile'))
@@ -189,7 +211,10 @@ def delete_account():
 
     try:
         # Удаляем пользователя из базы данных
-        cur.execute("DELETE FROM usersi WHERE id = %s", (session['user_id'],))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("DELETE FROM usersi WHERE id = %s", (session['user_id'],))
+        else:
+            cur.execute("DELETE FROM usersi WHERE id = ?", (session['user_id'],))
         conn.commit()
         session.pop('user_id', None)  # Удаляем данные сессии
         flash('Ваш аккаунт был успешно удален.')
@@ -214,7 +239,10 @@ def search():
 
     try:
         # Получаем текущего пользователя
-        cur.execute("SELECT * FROM usersi WHERE id = %s", (session['user_id'],))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM usersi WHERE id = %s", (session['user_id'],))
+        else:
+            cur.execute("SELECT * FROM usersi WHERE id = ?", (session['user_id'],))
         current_user = cur.fetchone()
 
         if not current_user:
@@ -227,14 +255,24 @@ def search():
         max_age = request.args.get('max_age', 25)  # Значение по умолчанию
 
         # Формируем запрос
-        query = """
-            SELECT * FROM usersi 
-            WHERE id != %s 
-              AND hidden = 0 
-              AND gender = %s 
-              AND age BETWEEN %s AND %s
-            ORDER BY id
-        """
+        if current_app.config['DB_TYPE'] == 'postgres':
+            query = """
+                SELECT * FROM usersi 
+                WHERE id != %s 
+                AND hidden = 0 
+                AND gender = %s 
+                AND age BETWEEN %s AND %s
+                ORDER BY id
+            """
+        else:
+            query = """
+                SELECT * FROM usersi 
+                WHERE id != ?
+                AND hidden = 0 
+                AND gender = ?
+                AND age BETWEEN ? AND ?
+                ORDER BY id
+            """
         params = (current_user['id'], looking_for, min_age, max_age)
 
         # Выполняем запрос
