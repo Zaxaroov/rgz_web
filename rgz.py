@@ -62,7 +62,10 @@ def register():
 
         try:
             # Проверяем существование пользователя
-            cur.execute("SELECT id FROM usersi WHERE username = %s", (data['Имя пользователя'],))
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("SELECT id FROM usersi WHERE username = %s", (data['Имя пользователя'],))
+            else:
+                cur.execute("SELECT id FROM usersi WHERE username = ?", (data['Имя пользователя'],))
             if cur.fetchone():
                 flash('Этот ник занят!')
                 return redirect(url_for('rgz.register'))
